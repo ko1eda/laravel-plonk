@@ -169,22 +169,41 @@ class PlonkStore implements PlonkStoreInterface
             $image->backup();
             $image->orientate();
 
-            switch ($this->getOrientation()) {
-                case PlonkOrientation::SQUARE:
-                case PlonkOrientation::LANDSCAPE:
-                    $image->resize($value['width'], null, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
-                    break;
+            if(! (strpos($value["name"], "beforeafter") === false)) {
+                switch ($this->getOrientation()) {
+                    case PlonkOrientation::SQUARE:
+                    case PlonkOrientation::LANDSCAPE:
+                        $image->resize($value['width'], $value['height'], function ($constraint) {
+                            $constraint->upsize();
+                        });
+                        break;
 
-                case PlonkOrientation::PORTRAIT:
-                    $image->resize(null, $value['height'], function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
-                    break;
+                    case PlonkOrientation::PORTRAIT:
+                        $image->resize($value['width'], $value['height'], function ($constraint) {
+                            // $constraint->aspectRatio();
+                            $constraint->upsize();
+                        });
+                        break;
+                }
+            } else {
+                switch ($this->getOrientation()) {
+                    case PlonkOrientation::SQUARE:
+                    case PlonkOrientation::LANDSCAPE:
+                        $image->resize($value['width'], null, function ($constraint) {
+                            $constraint->aspectRatio();
+                            $constraint->upsize();
+                        });
+                        break;
+    
+                    case PlonkOrientation::PORTRAIT:
+                        $image->resize(null, $value['height'], function ($constraint) {
+                            $constraint->aspectRatio();
+                            $constraint->upsize();
+                        });
+                        break;
+                }
             }
+
 
             $mimetype = PlonkMime::toExtension($this->file->getClientMimeType());
 
